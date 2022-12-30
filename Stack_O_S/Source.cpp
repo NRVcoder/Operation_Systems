@@ -30,21 +30,15 @@ public:
 			unique_lock<mutex> guard(m);
 			oldv->value = value;
 			guard.unlock();
-			//head.store(oldv);
 		}
 		else {
-			Node<T>* oldv = head.load();
-
-			while (oldv != nullptr) {
-				oldv = oldv->next;
-			}
-			/*do {
-				
-			} while (!head.compare_exchange_weak(oldv, nullptr));*/
-			//unique_lock<mutex> guard(m);
-			oldv = new Node<T>;
+			Node<T>* oldv = new Node<T>;
+			unique_lock<mutex> guard(m);
 			oldv->value = value;
-			//guard.unlock();
+			guard.unlock();
+			do {
+				oldv->next = head.load();
+			} while (!head.compare_exchange_weak(oldv->next, oldv));
 			
 		}
 	}
@@ -53,53 +47,23 @@ public:
 			return;
 		}
 		Node<T>* mem = head.load();
-		Node<T>* oldv = head.load();
-
-		oldv = oldv->next;
+		Node<T>* result;
+		do {
+			result = mem->next;
+		} while (!head.compare_exchange_weak(mem, result));
+		cout << mem->value << endl;
 		delete mem;
-		head.store(oldv);
-		cout << oldv->value;
+		cout << result->value;
 	}
-
-	
-	
-	
 };
 
+int main() {
+	Stack<int> st;
+	st.Push(4);
+	st.Push(5);
+	st.Push(6);
+	st.Pop();
 
-
-//condition_variable cv;
-//mutex m;
-//void NextPrime(int& value) {
-//	unique_lock<mutex> ul(m);
-//	while (!IsPrime(value)) {
-//		value++;
-//	}
-//	cv.notify_one();
-//}
-//void PrintNextPrime(int &value) {
-//	unique_lock<mutex> ul(m);
-//	cv.wait(ul);
-//	cout << value;
-//}
-
-/*class Semaphore {
-
-};*/
-	int main() {
-		Stack<int> st;
-		int a = 8;
-		st.Push(3);
-		st.Push(5);
-		st.Push(6);
-		st.Pop();
-
-	}
+}
 	
-	
-	/*int value = 14;
-	thread th1(PrintNextPrime, ref(value));
-	thread th2(NextPrime, ref(value));
-	th1.join();
-	th2.join();*/
 
