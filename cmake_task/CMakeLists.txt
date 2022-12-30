@@ -8,6 +8,6 @@ add_executable(myExe main.cpp)
 
 add_subdirectory(stack)
 
-target_include_directories(root_project STATIC stack/include/ThreadSafeStack.h solver/Solver.h)
+target_include_directories(myExe PUBLIC stack/include/ThreadSafeStack.h solver/Solver.h)
 
 target_link_libraries(myExe mylib)
