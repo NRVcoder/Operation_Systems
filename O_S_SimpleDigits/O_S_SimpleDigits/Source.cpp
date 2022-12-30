@@ -15,8 +15,9 @@ bool IsPrime(int value) {
 }
 void CountOfDigits(vector<int>& vec, int& pointer, mutex& mutex_pointer, mutex& mutex_counter, int& count) {
 	while(true) {
-		int a = pointer;
 		unique_lock<mutex> ptr(mutex_pointer);
+		int a = pointer;
+		
 		pointer++;
 		ptr.unlock();
 		if (pointer >= vec.size()) {

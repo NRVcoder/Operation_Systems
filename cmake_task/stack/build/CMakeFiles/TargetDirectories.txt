@@ -1,0 +1,3 @@
+C:/Users/User/Desktop/CMakeTask/project/stack/build/CMakeFiles/mylib.dir
+C:/Users/User/Desktop/CMakeTask/project/stack/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/User/Desktop/CMakeTask/project/stack/build/CMakeFiles/ZERO_CHECK.dir

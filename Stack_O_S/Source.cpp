@@ -12,8 +12,8 @@ struct Node {
 };
 template<class T>
 class Stack {
-	//Node<T> *head;
 	atomic<Node<T>*> head;
+	mutex m;
 public:
 	bool IsEmpty() {
 		if (head == nullptr) {
@@ -25,33 +25,40 @@ public:
 	}
 	void Push(T value) {
 		if (head == nullptr) {
-			
-			head = atomic <Node<T>>;
-			head->value = value;
-			head->next = nullptr;
+			head.store(new Node<T>);
+			Node<T>* oldv = head.load();
+			unique_lock<mutex> guard(m);
+			oldv->value = value;
+			guard.unlock();
+			//head.store(oldv);
 		}
+		else {
+			Node<T>* oldv = head.load();
 
-		atomic <Node<T>*> mem = head;
-		head = atomic <Node<T>>;
-		head->value = value;
-		head->next = mem;
+			while (oldv != nullptr) {
+				oldv = oldv->next;
+			}
+			/*do {
+				
+			} while (!head.compare_exchange_weak(oldv, nullptr));*/
+			//unique_lock<mutex> guard(m);
+			oldv = new Node<T>;
+			oldv->value = value;
+			//guard.unlock();
+			
+		}
 	}
 	void Pop() {
 		if (IsEmpty()) {
 			return;
 		}
-		/*Node* current = head;
-		Node* previous = nullptr;
-		while (current != nullptr || current->value != value) {
-			current = current->next;
-		}
-		if (current != nullptr) {
+		Node<T>* mem = head.load();
+		Node<T>* oldv = head.load();
 
-		}*/
-		Node<T>* mem = head;
-		head = head->next;
+		oldv = oldv->next;
 		delete mem;
-		cout << head->value;
+		head.store(oldv);
+		cout << oldv->value;
 	}
 
 	
@@ -79,15 +86,15 @@ public:
 /*class Semaphore {
 
 };*/
-int main() {
-	Stack<int> st;
-	int a = 8;
-	st.Push(3);
-	st.Push(5);
-	st.Push(6);
-	st.Pop();
-	
-	
+	int main() {
+		Stack<int> st;
+		int a = 8;
+		st.Push(3);
+		st.Push(5);
+		st.Push(6);
+		st.Pop();
+
+	}
 	
 	
 	/*int value = 14;
@@ -96,8 +103,3 @@ int main() {
 	th1.join();
 	th2.join();*/
 
-
-
-
-
-}
